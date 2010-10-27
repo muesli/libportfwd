@@ -12,12 +12,12 @@ so other projects can easily setup port fwds without shipping extra libs/deps.
 Should detect any upnp or nat-pmp router and automatically use the appropriate
 library under the hood.
 
-Uses cmake to build needed bits of miniupnpc..
+Uses cmake to build needed bits of miniupnpc.
 
 NB/TODO
 -------
-I don't have a nat-pmp capable device (eg: airport express)
-so haven't implemented that bit yet. only supports upnp atm.
+I don't have a nat-pmp capable device (eg: Airport Express)
+so haven't implemented that bit yet. Only supports upnp atm.
 
 Usage
 -----
@@ -27,4 +27,3 @@ See the demo in main.cpp, but here's the jist:
  pf.init(2000);   // 2000 = ms to wait for response from router
  pf.add(1234);    // port to fwd to you
  pf.remove(1234); // remove port fwding on exit
-

@@ -16,7 +16,7 @@ class Portfwd
         /// 2000 is typically enough.
         bool init(unsigned int timeout);
         void get_status();
-        bool add(unsigned short port);
+        bool add(unsigned short port, unsigned short internal_port );
         bool remove(unsigned short port);
         
         const std::string& external_ip() const 

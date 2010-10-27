@@ -4,6 +4,11 @@
 #include "miniupnpc.h"
 #include "upnpcommands.h"
 
+#ifdef WIN32
+#include <winsock2.h>
+#include "../include/portfwd/portfwd.h"
+#endif
+
 Portfwd::Portfwd()
  : urls(0), data(0)
 {
@@ -78,12 +83,12 @@ Portfwd::get_status()
 {
     // get connection speed
     UPNP_GetLinkLayerMaxBitRates(
-        urls->controlURL_CIF, data->servicetype_CIF, &m_downbps, &m_upbps);
+        urls->controlURL_CIF, data->CIF.servicetype, &m_downbps, &m_upbps);
 
     // get external IP adress
     char ip[16];
     if( 0 != UPNP_GetExternalIPAddress( urls->controlURL, 
-                                        data->servicetype, 
+                                        data->CIF.servicetype, 
                                         (char*)&ip ) )
     {
         m_externalip = ""; //failed
@@ -93,9 +98,9 @@ Portfwd::get_status()
 }
 
 bool
-Portfwd::add( unsigned short port )
+Portfwd::add( unsigned short port, unsigned short internal_port )
 {
-   char port_str[16];
+   char port_str[16], port_str_internal[16];
    int r;
    printf("Portfwd::add (%s, %d)\n", m_lanip.c_str(), port);
    if(urls->controlURL[0] == '\0')
@@ -104,8 +109,10 @@ Portfwd::add( unsigned short port )
        return false;
    }
    sprintf(port_str, "%d", port);
-   r = UPNP_AddPortMapping(urls->controlURL, data->servicetype,
-                           port_str, port_str, m_lanip.c_str(), 0, "TCP", NULL);
+   sprintf(port_str_internal, "%d", internal_port);
+
+   r = UPNP_AddPortMapping(urls->controlURL, data->CIF.servicetype,
+                           port_str, port_str_internal, m_lanip.c_str(), "tomahawk", "TCP", NULL);
    if(r!=0)
    {
     printf("AddPortMapping(%s, %s, %s) failed, code %d\n", port_str, port_str, m_lanip.c_str(), r);
@@ -125,7 +132,7 @@ Portfwd::remove( unsigned short port )
        return false;
    }
    sprintf(port_str, "%d", port);
-   int r = UPNP_DeletePortMapping(urls->controlURL, data->servicetype, port_str, "TCP", NULL);
+   int r = UPNP_DeletePortMapping(urls->controlURL, data->CIF.servicetype, port_str, "TCP", NULL);
    return r == 0;
 }
 
